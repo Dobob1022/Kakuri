@@ -10,51 +10,52 @@
 
 <body>
     <div id='includedContent'></div>
+    <div class="container">
     <button type="button" class="btn btn-info" id="QueryJobs">불러오기</button>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Job추가</button>
-    
-      
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#JobAdd">Job추가</button>
+    <table class="table">
+        <caption>Job 리스트</caption>
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">JobID</th>
+                <th scope="col">Job상태</th>
+                <th scope="col">Job이름</th>
+                <th scope="col">담당자</th>
+                <th scope="col">진척도</th>
+                <th scope="col">데드라인</th>
+                <th scope="col">자세히</th>
+            </tr>
+        </thead>
+        <tbody id="queryResponse">
+        </tbody>
+    </table>
+    </div>
 </body>
 
 
-<table class="table">
-    <caption>Job 리스트</caption>
-    <thead class="thead-light">
-        <tr>
-            <th scope="col">JobID</th>
-            <th scope="col">Job이름</th>
-            <th scope="col">담당자</th>
-            <th scope="col">진척도</th>
-            <th scope="col">데드라인</th>
-        </tr>
-    </thead>
-    <tbody id="queryResponse">
-    </tbody>
-</table>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- JobAddModal -->
+<div class="modal fade" id="JobAdd" tabindex="-1" role="dialog" aria-labelledby="AddJobModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Job추가</h5>
+          <h5 class="modal-title" id="AddJobModal">Job추가</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
             Job 유형
-            <!-- 드랍다운 -->
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="trues">
-                  Job유형
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  <a class="dropdown-item" href="#">납품</a>
-                  <a class="dropdown-item" href="#">RMA</a>
-                  <a class="dropdown-item" href="#">딜리버리</a>
-                </div>
-              </div>
+            <select class="form-select" aria-label="Default select example", id="JobType">
+              <option value="New">신규입고</option>
+              <option value="Delivery">딜리버리</option>
+              <option value="RMA">RMA</option>
+            </select>
+            엔드유저
+            <input type="text" class="form-control" id="EndUser">
+            작업위치
+            <input type="text" class="form-control" id="Location">
+            타겟(호스트네임 or 상면위치 or 층)
+            <input type="text" class="form-control" id="Target">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
@@ -63,6 +64,38 @@
       </div>
     </div>
   </div>
+<!-- JobDetailModal -->
+  <div class="modal fade" id="JobDetailModal" tabindex="-1" role="dialog" aria-labelledby="JobDetailModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="JobDetailModal">자세히</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <!-- Job 유형 :납품<br>
+            엔드유저 : 붐붐<br>
+            작업위치 : 붐붐건물 6층<br>
+            타겟(호스트네임 or 상면위치 or 층) : yk-dat-bbombbom-master-92<br>
+            추가일 : 2022-09-21 22:44<br> 
+            마지막 편집일 : 2022-09-23 22:33
+            마지막 편집한사람 : dobob<br> -->
+            
+              <div id ="jobDetailQuery" class="thead-light"></div>
+            
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" id="InsertJob">삭제</button>
+          <button type="button" class="btn btn-info" id="InsertJob">편집</button>
+          <button type="button" class="btn btn-success" id="InsertJob">완료</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 
 <script>    
@@ -71,8 +104,9 @@
         $("#includedContent").load(filename);
     });
     $(document).on('click', "#QueryJobs", () => {
+      let address = $(location).attr('host'); 
         $.ajax({
-            url: `http://127.0.0.1:8000/api/job`,
+            url: `http://dobob.iptime.org:7000/api/job`,
             contentType:"application/json",
             type: "GET",
             // headers: {
@@ -84,21 +118,24 @@
                 let count = 0;
                 result = JSON.parse(req)
                 // console.log(req)
-                for(var i=0; i<result.length; i++){ //배열 값 순차적으로 확인
-                    var jsonObject = JSON.parse(JSON.stringify(result[i])); //각 배열에 있는 jsonObject 참조
+                for(let i=0; i<result.length; i++){ 
+                    var jsonObject = result[i]; 
                     console.log(jsonObject.JobId)
                     $("#queryResponse").append(`
                         <tr>
                         <td>${jsonObject.JobId}</td>
+                        <td>${jsonObject.status}</td>
                         <td>${jsonObject.Name}</td>
                         <td>${jsonObject.manager}</td>
                         <td>
                         <div class="progress">
-                        <div class="progress-bar" role="progressbar" aria-valuenow="${jsonObject.Progress}" aria-valuemin="0" aria-valuemax="100">${jsonObject.Progress}%</div></td>
+                        <div class="progress-bar" role="progressbar" aria-valuenow="${jsonObject.Progress}" style="width:${jsonObject.Progress}%" aria-valuemin="0" aria-valuemax="100">${jsonObject.Progress}%</div></td>
                         <td>${jsonObject.DeadLine}</td>
+                        <td><button onclick="shit('${jsonObject.JobId}')" type="button" class="btn btn-primary" data-toggle="modal" data-target="#JobDetailModal">자세히</button></td>
                         </tr>
                     `);
                     ++count;
+                    
                 }
 
                 }
@@ -108,50 +145,66 @@
             }
         })
     })
+    
     $(document).on('click', "#InsertJob", () => {
-        $('#datebox').val($(this).html());
-});
-    //     $.ajax({
-    //         url: `http://127.0.0.1:8000/api/job`,
-    //         contentType:"application/json",
-    //         type: "POST",
-    //         // headers: {
-    //         //     'Authorization': `Bearer ${Cookies.get('token')}`
-    //         // },
-    //         dataType: "json",
-    //         success: (req) => {
-    //             $("#queryResponse").empty();
-    //             let count = 0;
-    //             result = JSON.parse(req)
-    //             // console.log(req)
-    //             for(var i=0; i<result.length; i++){ //배열 값 순차적으로 확인
-    //                 var jsonObject = JSON.parse(JSON.stringify(result[i])); //각 배열에 있는 jsonObject 참조
-    //                 console.log(jsonObject.JobId)
-    //                 $("#queryResponse").append(`
-    //                     <tr>
-    //                     <td>${jsonObject.JobId}</td>
-    //                     <td>${jsonObject.Name}</td>
-    //                     <td>${jsonObject.manager}</td>
-    //                     <td>
-    //                     <div class="progress">
-    //                     <div class="progress-bar" role="progressbar" aria-valuenow="${jsonObject.Progress}" aria-valuemin="0" aria-valuemax="100">${jsonObject.Progress}%</div></td>
-    //                     <td>${jsonObject.DeadLine}</td>
-    //                     </tr>
-    //                 `);
-    //                 ++count;
-    //             }
+      let address = $(location).attr('host'); 
+        let EndUser = $('#EndUser').val()
+        let Location = $('#Location').val()
+        let Target = $('#Target').val()
+        let SendData = {
+          "JobType": $('select').val(),
+          "EndUser": EndUser,
+          "Location": Location,
+          "Target": Target,
+        }
+        console.log(SendData)
+        // $.ajax({
+        //     url: `http://dobob.iptime.org:7000/api/db`,
+        //     type: "POST",
+        //     contentType:"application/json",
+        //     dataType: "JSON",
+        //     data: JSON.stringify(SendData),
+        //     // headers: {
+        //     //     'Authorization': `Bearer ${Cookies.get('token')}`
+        //     // },
+        //     success: (req) => {
+        //         console.log(req)
+        //         alert(req.msg);
+        //     },
+        //     error: function (request) {
+        //         alert(request.responseJSON.msg);
+        //     }
+    });
 
-    //             }
-    //         ,
-    //         error: function (request) {
-    //             alert(request.responseJSON.msg);
-    //         }
-    //     })
-    // })
+    // api 에서 긁어와서 modal 에 뿌려주는거 
+    function shit(jobId){
+            $.ajax({
+            url: `http://dobob.iptime.org:7000/api/job/${jobId}`,
+            contentType:"application/json",
+            type: "GET",
+                        success: (req) => {
+                          let data = JSON.parse(req)
+                          console.log(data.JobId);
+                          console.log($('#jobDetailQuery'));
+                          console.log(data);
+                          $("#jobDetailQuery").append(`
+                          <p>JobID:${data.JobId}</p>
+                          <p>status:${data.status}</p>
+                          <p>Name:${data.Name}</p>
+                          <p>target:${data.target}</p>
+                          <p>Description:${data.Description}</p>
+                        `);}
 
+                      // <th scope="col">Job상태:</th><br>
+                      // <th scope="col">Job이름:</th><br>
+                      // <th scope="col">담당자:</th><br>
+                      // <th scope="col">진척도:</th><br>
+                      // <th scope="col">데드라인:</th><br>
+                      // <th scope="col">자세히:</th><br>
+                        
+            });
+    }
 
-
-
-
+</script>
 
 </html>
