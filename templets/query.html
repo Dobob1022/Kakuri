@@ -50,12 +50,25 @@
               <option value="Delivery">딜리버리</option>
               <option value="RMA">RMA</option>
             </select>
+            Job 이름
+            <input type="text" class="form-control" id="Job_Name">
             엔드유저
             <input type="text" class="form-control" id="EndUser">
             작업위치
             <input type="text" class="form-control" id="Location">
             타겟(호스트네임 or 상면위치 or 층)
             <input type="text" class="form-control" id="Target">
+            설명
+            <input type="text" class="form-control" id="Description">
+            데드라인
+            <input type="text" class="form-control" id="DeadLine">
+            담당자
+            <input type="text" class="form-control" id="manager">
+            고객사담당자
+            <input type="text" class="form-control" id="customerManger">
+            고객사 담당자 전화번호
+            <input type="text" class="form-control" id="customerManager_contect">
+            
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
@@ -106,7 +119,7 @@
     $(document).on('click', "#QueryJobs", () => {
       let address = $(location).attr('host'); 
         $.ajax({
-            url: `http://dobob.iptime.org:7000/api/job`,
+            url: `http://127.0.0.1:7000/api/job`,
             contentType:"application/json",
             type: "GET",
             // headers: {
@@ -131,7 +144,7 @@
                         <div class="progress">
                         <div class="progress-bar" role="progressbar" aria-valuenow="${jsonObject.Progress}" style="width:${jsonObject.Progress}%" aria-valuemin="0" aria-valuemax="100">${jsonObject.Progress}%</div></td>
                         <td>${jsonObject.DeadLine}</td>
-                        <td><button onclick="shit('${jsonObject.JobId}')" type="button" class="btn btn-primary" data-toggle="modal" data-target="#JobDetailModal">자세히</button></td>
+                        <td><button onclick="LoadJob('${jsonObject.JobId}')" type="button" class="btn btn-primary" data-toggle="modal" data-target="#JobDetailModal">자세히</button></td>
                         </tr>
                     `);
                     ++count;
@@ -148,38 +161,50 @@
     
     $(document).on('click', "#InsertJob", () => {
       let address = $(location).attr('host'); 
-        let EndUser = $('#EndUser').val()
+        let Description = $('#Description').val()
+        let DeadLine = $('#DeadLine').val()
         let Location = $('#Location').val()
+        let EndUser = $('#EndUser').val()
+        let manager = $('#manager').val()
         let Target = $('#Target').val()
+        let Job_Name = $('#Job_Name').val()
+        let customerManger = $('#customerManger').val()
+        let customerManager_contect = $('#customerManager_contect').val()
         let SendData = {
           "JobType": $('select').val(),
           "EndUser": EndUser,
           "Location": Location,
           "Target": Target,
+          "Description":Description,
+          "DeadLine":DeadLine,
+          "manager":manager,
+          "customerManger":customerManger,
+          "customerManager_contect":customerManager_contect
         }
-        console.log(SendData)
-        // $.ajax({
-        //     url: `http://dobob.iptime.org:7000/api/db`,
-        //     type: "POST",
-        //     contentType:"application/json",
-        //     dataType: "JSON",
-        //     data: JSON.stringify(SendData),
-        //     // headers: {
-        //     //     'Authorization': `Bearer ${Cookies.get('token')}`
-        //     // },
-        //     success: (req) => {
-        //         console.log(req)
-        //         alert(req.msg);
-        //     },
-        //     error: function (request) {
-        //         alert(request.responseJSON.msg);
-        //     }
+        console.log(JSON.stringify(SendData))
+        $.ajax({
+            url: `http://127.0.0.1:7000/api/job`,
+            type: "POST",
+            contentType:"application/json",
+            dataType: "JSON",
+            data: JSON.stringify(SendData),
+            // headers: {
+            //     'Authorization': `Bearer ${Cookies.get('token')}`
+            // },
+            success: (req) => {
+                console.log(req)
+                alert(req.msg);
+            },
+            error: function (request) {
+                alert(request.responseJSON.msg);
+            }
+          })
     });
 
     // api 에서 긁어와서 modal 에 뿌려주는거 
-    function shit(jobId){
+    function LoadJob(jobId){
             $.ajax({
-            url: `http://dobob.iptime.org:7000/api/job/${jobId}`,
+            url: `http://127.0.0.1:7000/api/job/${jobId}`,
             contentType:"application/json",
             type: "GET",
                         success: (req) => {
@@ -194,13 +219,6 @@
                           <p>target:${data.target}</p>
                           <p>Description:${data.Description}</p>
                         `);}
-
-                      // <th scope="col">Job상태:</th><br>
-                      // <th scope="col">Job이름:</th><br>
-                      // <th scope="col">담당자:</th><br>
-                      // <th scope="col">진척도:</th><br>
-                      // <th scope="col">데드라인:</th><br>
-                      // <th scope="col">자세히:</th><br>
                         
             });
     }
