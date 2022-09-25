@@ -23,6 +23,7 @@
                 <th scope="col">담당자</th>
                 <th scope="col">진척도</th>
                 <th scope="col">데드라인</th>
+                <th scope="col">상태</th>
                 <th scope="col">자세히</th>
             </tr>
         </thead>
@@ -130,10 +131,18 @@
                 $("#queryResponse").empty();
                 let count = 0;
                 result = JSON.parse(req)
-                // console.log(req)
+                let StatusValue
                 for(let i=0; i<result.length; i++){ 
                     var jsonObject = result[i]; 
                     console.log(jsonObject.JobId)
+                    if (jsonObject.status == "Active"){
+                      StatusValue = `<span class="badge badge-info">진행중</span>`
+                      console.log("ACTIVE")
+                    }
+                    else{
+                      StatusValue = `<span class="badge badge-Success">완료</span>`
+                      console.log("INACTIVE")
+                    }
                     $("#queryResponse").append(`
                         <tr>
                         <td>${jsonObject.JobId}</td>
@@ -144,6 +153,7 @@
                         <div class="progress">
                         <div class="progress-bar" role="progressbar" aria-valuenow="${jsonObject.Progress}" style="width:${jsonObject.Progress}%" aria-valuemin="0" aria-valuemax="100">${jsonObject.Progress}%</div></td>
                         <td>${jsonObject.DeadLine}</td>
+                        <td>${StatusValue}</td>
                         <td><button onclick="LoadJob('${jsonObject.JobId}')" type="button" class="btn btn-primary" data-toggle="modal" data-target="#JobDetailModal">자세히</button></td>
                         </tr>
                     `);
@@ -172,6 +182,7 @@
         let customerManager_contect = $('#customerManager_contect').val()
         let SendData = {
           "JobType": $('select').val(),
+          "JobName": Job_Name,
           "EndUser": EndUser,
           "Location": Location,
           "Target": Target,
@@ -209,15 +220,23 @@
             type: "GET",
                         success: (req) => {
                           let data = JSON.parse(req)
-                          console.log(data.JobId);
-                          console.log($('#jobDetailQuery'));
-                          console.log(data);
+                          
+                          let StatusValue
+                          if (data[0].status == "Active"){
+                                StatusValue = `<span class="badge badge-info">진행중</span>`
+                                console.log("ACTIVE")
+                              }
+                          else{
+                            StatusValue = `<span class="badge badge-Success">완료</span>`
+                            console.log("INACTIVE")
+                          }
+                          console.log(data[0].Description)
                           $("#jobDetailQuery").append(`
-                          <p>JobID:${data.JobId}</p>
-                          <p>status:${data.status}</p>
-                          <p>Name:${data.Name}</p>
-                          <p>target:${data.target}</p>
-                          <p>Description:${data.Description}</p>
+                          <p>JobID:${data[0].JobId}</p>
+                          <p>상태:${StatusValue}</p>
+                          <p>Job이름:${data[0].Name}</p>
+                          <p>타겟:${data[0].Target}</p>
+                          <p>설명:${data[0].Description}</p>
                         `);}
                         
             });
