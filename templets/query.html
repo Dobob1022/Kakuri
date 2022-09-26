@@ -5,7 +5,11 @@
     <script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+  
+
 </head>
 
 <body>
@@ -44,36 +48,36 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div id="modalForm" class="modal-body">
             Job 유형
-            <select class="form-select" aria-label="Default select example", id="JobType">
+            <select name="JobType" class="form-select" aria-label="Default select example" id="JobType">
               <option value="New">신규입고</option>
               <option value="Delivery">딜리버리</option>
               <option value="RMA">RMA</option>
             </select>
             Job 이름
-            <input type="text" class="form-control" id="Job_Name">
+            <input name="JobName" type="text" class="form-control" id="Job_Name"placeholder="Enter username">
             엔드유저
-            <input type="text" class="form-control" id="EndUser">
+            <input name="EndUser" type="text" class="form-control" id="EndUser"placeholder="엔드유저">
             작업위치
-            <input type="text" class="form-control" id="Location">
+            <input name="Location" type="text" class="form-control"id="Location" placeholder="작업위치">
             타겟(호스트네임 or 상면위치 or 층)
-            <input type="text" class="form-control" id="Target">
+            <input name="Target" type="text" class="form-control" id="Target"placeholder="타겟(호스트네임, 상면위치, 층">
             설명
-            <input type="text" class="form-control" id="Description">
+            <input name="Description" type="text" class="form-control" id="Description"placeholder="자세한 설명">
             데드라인
-            <input type="text" class="form-control" id="DeadLine">
-            담당자
-            <input type="text" class="form-control" id="manager">
-            고객사담당자
-            <input type="text" class="form-control" id="customerManger">
+            <input name="DeadLine" type="text" class="form-control" id="DeadLine"placeholder="데드라인">
+            담당자(사내)
+            <input name="manager" type="text" class="form-control" id="manager" placeholder="위즈씨앤에스 담당자">
+            고객사 담당자
+            <input name="customerManger" type="text" class="form-control"id="customerManger" placeholder="고객사 담당자">
             고객사 담당자 전화번호
-            <input type="text" class="form-control" id="customerManager_contect">
+            <input name="customerManager_contect" type="text" class="form-control"id="customerManager_contect" placeholder="고객사 담당자 전화번호">
             
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
-          <button type="button" class="btn btn-primary" id="InsertJob">저장</button>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+              <button type="button" class="btn btn-primary" id="InsertJob">저장</button>
+            </div>
         </div>
       </div>
     </div>
@@ -88,24 +92,10 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-            <!-- Job 유형 :납품<br>
-            엔드유저 : 붐붐<br>
-            작업위치 : 붐붐건물 6층<br>
-            타겟(호스트네임 or 상면위치 or 층) : yk-dat-bbombbom-master-92<br>
-            추가일 : 2022-09-21 22:44<br> 
-            마지막 편집일 : 2022-09-23 22:33
-            마지막 편집한사람 : dobob<br> -->
-            
+        <div class="modal-body">            
               <div id ="jobDetailQuery" class="thead-light"></div>
-            
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" id="InsertJob">삭제</button>
-          <button type="button" class="btn btn-info" id="InsertJob">편집</button>
-          <button type="button" class="btn btn-success" id="InsertJob">완료</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
-        </div>
+
       </div>
     </div>
   </div>
@@ -117,10 +107,17 @@
         var filename = "components/navbar.html";
         $("#includedContent").load(filename);
     });
+    console.log(`
+    
+ +-+-+-+-+ +-+-+ +-+-+-+-+-+
+ |M|A|D|E| |B|Y| |D|O|B|O|B|
+ +-+-+-+-+ +-+-+ +-+-+-+-+-+
+
+`)
     $(document).on('click', "#QueryJobs", () => {
       let address = $(location).attr('host'); 
         $.ajax({
-            url: `http://127.0.0.1:7000/api/job`,
+            url: `http://dobob.iptime.org:7000/api/job`,
             contentType:"application/json",
             type: "GET",
             // headers: {
@@ -140,7 +137,7 @@
                       console.log("ACTIVE")
                     }
                     else{
-                      StatusValue = `<span class="badge badge-Success">완료</span>`
+                      StatusValue = `<span class="badge badge-success">완료</span>`
                       console.log("INACTIVE")
                     }
                     $("#queryResponse").append(`
@@ -212,7 +209,55 @@
           })
     });
 
-    // api 에서 긁어와서 modal 에 뿌려주는거 
+    // Job Delete
+      $(document).on('click', "#DeleteJob", (e) => {
+      // let address = $(location).attr('host'); 
+      $.ajax({
+          url: `http://127.0.0.1:7000/api/job/${e.target.value}`,
+          type: "DELETE",
+          contentType:"application/json",
+          dataType: "JSON",
+          // data: JSON.stringify(SendData),
+          // headers: {
+          //     'Authorization': `Bearer ${Cookies.get('token')}`
+          // },
+          success: (req) => {
+              console.log(req)
+              alert(req.msg);
+          },
+          error: function (request) {
+              console.log(request)
+              alert(request.msg);
+          }
+        })
+  });
+  // Job Done
+  $(document).on('click', "#DoneJob", (e) => {
+      // let address = $(location).attr('host'); 
+      let SendData = {
+        "status":"done"
+      }
+      $.ajax({
+          url: `http://127.0.0.1:7000/api/job/${e.target.value}`,
+          type: "PUT",
+          contentType:"application/json",
+          dataType: "JSON",
+          data: JSON.stringify(SendData),
+          // headers: {
+          //     'Authorization': `Bearer ${Cookies.get('token')}`
+          // },
+          success: (req) => {
+              console.log(req)
+              alert(req.msg);
+          },
+          error: function (request) {
+              console.log(request)
+              alert(request.msg);
+          }
+        })
+  });
+
+    // Modal Appear
     function LoadJob(jobId){
             $.ajax({
             url: `http://127.0.0.1:7000/api/job/${jobId}`,
@@ -220,16 +265,14 @@
             type: "GET",
                         success: (req) => {
                           let data = JSON.parse(req)
-                          
                           let StatusValue
                           if (data[0].status == "Active"){
                                 StatusValue = `<span class="badge badge-info">진행중</span>`
-                                console.log("ACTIVE")
                               }
                           else{
-                            StatusValue = `<span class="badge badge-Success">완료</span>`
-                            console.log("INACTIVE")
+                            StatusValue = `<span class="badge badge-success">완료</span>`
                           }
+                          $("#jobDetailQuery").empty()
                           console.log(data[0].Description)
                           $("#jobDetailQuery").append(`
                           <p>JobID:${data[0].JobId}</p>
@@ -237,10 +280,17 @@
                           <p>Job이름:${data[0].Name}</p>
                           <p>타겟:${data[0].Target}</p>
                           <p>설명:${data[0].Description}</p>
+                          <div class="modal-footer">
+                            <button value="${data[0].JobId}" type="button" class="btn btn-danger" id="DeleteJob">삭제</button>
+                            <button value="${data[0].JobId}" type="button" class="btn btn-info" id="EditJob">편집</button>
+                            <button value="${data[0].JobId}" type="button" class="btn btn-success" id="DoneJob">완료</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+                          </div>
                         `);}
                         
             });
     }
+  
 
 </script>
 

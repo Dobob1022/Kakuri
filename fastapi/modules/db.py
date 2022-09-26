@@ -73,20 +73,8 @@ def insert_job(JobID,JobType,Status,Name,EndUser,Location,Target,Manager,Descrip
 
 def load_jobs():
     raw_db_Data = session.query(Job.job_id,Job.job_name,Job.EndUser,Job.location,Job.target,Job.description,Job.deadLine,Job.manager,Job.customer_manger,Job.customerManager_contect,Job.progress,Job.add_date,Job.lastedit_time,Job.lastedit_user,Job.status).all()
-    
     session.close()
     return raw_db_Data
-
-    
-# def load_jobs():
-#     # try:
-#         return = session.query(Job).all()
-#     # except IntegrityError as e:
-#     #     session.close()
-#     #     return {"msg":"Error On DB!"}
-#     # except:
-#     #     session.close()
-#     #     return {"msg":"DB Connection-ERROR"}
 
 def load_job(JobID):
     # try:
@@ -95,6 +83,19 @@ def load_job(JobID):
     #     return {"Message":"ERR_ON_DB"}
     # session.close()
     return queried_data
-##Initialize##
 
+def remove_job(JobID):
+    try:
+        session.query(Job).filter(Job.job_id == JobID).delete()
+        session.commit()
+        session.close()
+        return True
+    except:
+        session.rollback()
+        session.close()
+        return False
 
+def done_job(JobID):
+    session.query(Job).filter(Job.job_id == JobID).update({'status':"Inactive",'progress':"100"})
+    session.commit()
+    session.close()

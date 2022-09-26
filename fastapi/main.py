@@ -39,6 +39,10 @@ app.add_middleware(
 #     customerManger : str
 #     customerManager_contect : str
 
+class DoneJob(BaseModel):
+    status : str
+
+
 class InsertJob(BaseModel):
     JobType : str
     JobName : str
@@ -80,34 +84,12 @@ def root():
 
 @app.get("/api/job")
 def LoadJobs():
-    print(db.load_jobs())
-    print(json.dumps(JsonConvert(db.load_jobs())))
     return json.dumps(JsonConvert(db.load_jobs()))
 
 @app.get("/api/job/{job_id}")
 def read_jobid(job_id):
     print(json.dumps(JsonConvert(db.load_job(job_id))))
     return json.dumps(JsonConvert(db.load_job(job_id)))
-
-# @app.get("/api/job/20220925-N-Kakaobank")
-# def read_jobid():
-#     result = {
-#         "JobId":"20220922_R_KABANK",
-#         "status":"active",
-#         "Name":"카뱅-상암-RMA작업",
-#         "target":"sp-dat-01",
-#         "Description":"TESTJOB",
-#         "Progress":"40",
-#         "AddDate":"2022-09-22",
-#         "DeadLine":"2022-09-23",
-#         "LastEdit":"Dobob",
-#         "LastEditTime":"2022-09-22",
-#         "manager":"dobob",
-#         "customerManger":"조성본",
-#         "customerManager_contect":"010-1111-1111"
-#     }
-#     return json.dumps(result)
-
 
 @app.post("/api/job")
 def get_body(request:InsertJob):
@@ -128,6 +110,18 @@ def get_body(request:InsertJob):
     elif request.JobType == "RMA":
         JobID = str(date).replace("-","")+"-"+"R"+"-"+enduser
         db.insert_job(JobID=JobID,JobType=request.JobType,Status=status,Name=request.JobName,EndUser=request.EndUser,Location=request.Location,Target=request.Target)
-        return {"message":"Sucess!"}
     else:
         return "fuq"
+
+@app.delete("/api/job/{job_id}")
+def Remove_Job(job_id):
+    if db.remove_job(job_id) == True:
+        return {"msg":"성공적으로 삭제하였습니다!"}
+    else:
+        return {"msg":"삭제 실패!"}
+
+@app.put("/api/job/{job_id}")
+def updateJob(job_id):
+    db.done_job(job_id)
+    print(db.load_jobs())
+    return{"msg":"FUQ"}
